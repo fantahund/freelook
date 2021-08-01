@@ -1,7 +1,7 @@
 package freelookmod.freelookmod.mixin;
 
 
-import freelookmod.freelookmod.CameraOverriddenEntity;
+import freelookmod.freelookmod.CameraControl;
 import freelookmod.freelookmod.client.FreelookmodClient;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.entity.Entity;
@@ -13,13 +13,14 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(Entity.class)
-public class EntityMixin implements CameraOverriddenEntity {
+public class EntityMixin implements CameraControl {
 	@Unique
 	private float cameraPitch;
 
 	@Unique
 	private float cameraYaw;
 
+	@SuppressWarnings("ConstantConditions")
 	@Inject(method = "changeLookDirection", at = @At("HEAD"), cancellable = true)
 	public void changeCameraLookDirection(double xDelta, double yDelta, CallbackInfo ci) {
 		if (!FreelookmodClient.isFreeLooking || !((Object) this instanceof ClientPlayerEntity)) return;
@@ -29,7 +30,7 @@ public class EntityMixin implements CameraOverriddenEntity {
 
 		this.cameraPitch = MathHelper.clamp(this.cameraPitch + (float) pitchDelta, -90.0f, 90.0f);
 		this.cameraYaw += (float) yawDelta;
-	
+
 		ci.cancel();
 	}
 
